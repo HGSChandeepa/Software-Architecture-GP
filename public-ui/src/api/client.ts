@@ -13,3 +13,20 @@ export const authAPI = {
     register: (email: string, password: string, name: string, role: string) =>
         axios.post(`${API_BASE.auth}/register`, { email, password, name, role })
 };
+
+export const stallAPI = {
+    getAll: () => axios.get(`${API_BASE.stalls}`),
+    getAvailable: () => axios.get(`${API_BASE.stalls}/available`)
+};
+
+export const reservationAPI = {
+    create: (stallIds: number[], token: string) =>
+        axios.post(`${API_BASE.reservations}/reserve`, { stallIds }, {
+            headers: { Authorization: `Bearer ${token}` }
+        }),
+
+    getMyReservations: (token: string) =>
+        axios.get(`${API_BASE.reservations}/my-reservations`, {
+            headers: { Authorization: `Bearer ${token}` }
+        })
+};
