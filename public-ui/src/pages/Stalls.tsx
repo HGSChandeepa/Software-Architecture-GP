@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Stall, Reservation } from '../types';
+import type { Stall, Reservation } from '../types';
 import { stallAPI, reservationAPI } from '../api/client';
 import { QRCodeCanvas } from 'qrcode.react';
 
