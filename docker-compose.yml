@@ -1,0 +1,93 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: bookfair
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - postgres_data:/var/lib/postgresql/data
+
+  auth-service:
+    build: ./auth-service
+    ports:
+      - "3001:3001"
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=bookfair
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - JWT_SECRET=your-secret-key-change-in-production
+      - NODE_ENV=development
+    depends_on:
+      - postgres
+    volumes:
+      - ./auth-service/src:/app/src
+
+  stall-service:
+    build: ./stall-service
+    ports:
+      - "3002:3002"
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=bookfair
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - NODE_ENV=development
+    depends_on:
+      - postgres
+    volumes:
+      - ./stall-service/src:/app/src
+
+  reservation-service:
+    build: ./reservation-service
+    ports:
+      - "3003:3003"
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=bookfair
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - JWT_SECRET=your-secret-key-change-in-production
+      - SMTP_HOST=smtp.ethereal.email
+      - SMTP_PORT=587
+      - SMTP_USER=test@example.com
+      - SMTP_PASS=test
+      - NODE_ENV=development
+    depends_on:
+      - postgres
+    volumes:
+      - ./reservation-service/src:/app/src
+
+  public-ui:
+    build: ./public-ui
+    ports:
+      - "4001:4001"
+    depends_on:
+      - auth-service
+      - stall-service
+      - reservation-service
+    volumes:
+      - ./public-ui/src:/app/src
+
+  employee-ui:
+    build: ./employee-ui
+    ports:
+      - "4002:4002"
+    depends_on:
+      - auth-service
+      - stall-service
+      - reservation-service
+    volumes:
+      - ./employee-ui/src:/app/src
+
+volumes:
+  postgres_data:
