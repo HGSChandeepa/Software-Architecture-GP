@@ -14,6 +14,10 @@ app.get("/health", (req, res) => {
   res.json({ status: "OK", service: "stall-service" });
 });
 
+app.get("/stall-status", (req, res) => {
+  res.json({ status: "OK", service: "stall-service-status" });
+});
+
 app.listen(PORT, () => {
   console.log(`Stall Service running on port ${PORT}`);
 });
